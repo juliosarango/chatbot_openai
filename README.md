@@ -249,7 +249,7 @@ python platzi_bot.py
 
 ## Probar el bot en línea
 1. Abrir la aplicación telegram
-2. Buscar el bot @julio_sarangoq_platzi_bot
+2. Buscar el bot @julio_sarango_platzi_bot
 3. Preguntar sobre algún conocimiento que desea adquirir. Ejm: "¿Qué curso debo segguir para aprender java?"
 4. Obtendrá le respuesta en base al modelo entrenado
 
