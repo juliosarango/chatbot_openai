@@ -1,0 +1,78 @@
+import os
+import time
+import requests
+from openai import OpenAI, OpenAIError
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+
+def get_updates(offset=None):
+    telegram_url = os.environ.get("TELEGRAM_BOT_URL")
+    telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    url = f"{telegram_url}{telegram_token}/getUpdates"
+    params = {
+        "timeout": 100,
+        "offset": offset,
+    }
+    response = requests.get(url=url, params=params)
+
+    return response.json()["result"]
+
+
+def send_messages(chat_id, text):
+    telegram_url = os.environ.get("TELEGRAM_BOT_URL")
+    telegram_token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    url = f"{telegram_url}{telegram_token}/sendMessage"
+    params = {
+        "chat_id": chat_id,
+        "text": text,
+    }
+
+    response = requests.post(url=url, params=params)
+
+    return response
+
+
+def get_openai_response(prompt):
+    system = """Eres un asitente de atención a clientes y estudiantes de la 
+    plataforma de educación en línea en tecnología, inglés y liderazgo llamado Platzi"""
+
+    try:
+        response = openai_client.chat.completions.create(
+            model=os.environ.get("OPENAI_MODEL_FINE_TUNING"),
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=150,
+            n=1,
+            temperature=0.8,
+        )
+
+        return response.choices[0].message.content.strip()
+    except OpenAIError as e:
+        print(f"La API de OpenAI devolvió un error: {e}")
+
+
+def main():
+    print("starting bot...")
+    offset = 0
+    while True:
+        updates = get_updates(offset=offset)
+        if updates:
+            for update in updates:
+                offset = update["update_id"] + 1
+                chat_id = update["message"]["chat"]["id"]
+                user_message = update["message"]["text"]
+                print(f"Message received: {user_message}")
+                gpt = get_openai_response(user_message)
+                send_messages(chat_id, gpt)
+        else:
+            time.sleep(1)
+
+
+if __name__ == "__main__":
+    main()

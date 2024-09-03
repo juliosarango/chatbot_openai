@@ -196,3 +196,62 @@ Para validar el modelo en la playground de OpenAI, se puede ajustar los parámet
 2. Fine tuning
 3. Evaluación
 4. Optimizar parámetros en la validación
+
+# Creación del bot en telegram:
+1. Abrir la aplicación de telegram en web o app
+2. Buscar @BotFather
+3. Seguir los pasos indicados para crear el bot.
+4. Puede agregar descripción, cambiar nombre usando los comandos:
+
+```
+ /setname
+ /setdescription
+ /setabouttext
+ ```
+5. Copiar el token del bot que luego será usado para interctuar con él
+
+6. Integración del bot con nuestro modelo de OpenAI
+ Esta integración se lo realiza en el archivo platzi_bot.py
+
+## Pasos para ejecutar localmente
+1. Crear un ambiente virtual
+```
+python -m venv venv
+source venv/bin/activate
+```
+
+2. Copiar el archivo .env-example por .env y agregar los valores respectivos
+
+```
+OPENAI_API_KEY=
+OPENAI_ID_MODELO=
+OPENAI_MODEL_FINE_TUNING=
+
+TELEGRAM_BOT_URL=https://api.telegram.org/bot
+TELEGRAM_BOT_TOKEN=
+```
+3. Instalar las dependencias del proyecto:
+
+```
+pip install -r requirements.txt
+```
+4. En caso de requerir ejecutar los scripts de pruebas, validaciones, resultados, ejecutar cada uno de estos archivos de manera individual, ejm:
+```
+python resultados_entrenamiento.py
+python validacion_fine-tuning.py
+```
+
+5. Ejecutar el archivo que realiza la integración con bot y nuestro model de OpenAI
+
+```
+python platzi_bot.py
+```
+
+## Probar el bot en línea
+1. Abrir la aplicación telegram
+2. Buscar el bot @julio_sarangoq_platzi_bot
+3. Preguntar sobre algún conocimiento que desea adquirir. Ejm: "¿Qué curso debo segguir para aprender java?"
+4. Obtendrá le respuesta en base al modelo entrenado
+
+![Telegram bot](images/telegram.png)
+
