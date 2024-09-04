@@ -17,9 +17,13 @@ def get_updates(offset=None):
         "timeout": 100,
         "offset": offset,
     }
-    response = requests.get(url=url, params=params)
 
-    return response.json()["result"]
+    try:
+        response = requests.get(url=url, params=params)
+
+        return response.json()["result"]
+    except Exception as e:
+        print(f"Error al obtener actualizaciones del bot de telegram: {e}")
 
 
 def send_messages(chat_id, text):
@@ -30,10 +34,13 @@ def send_messages(chat_id, text):
         "chat_id": chat_id,
         "text": text,
     }
+    try:
 
-    response = requests.post(url=url, params=params)
+        response = requests.post(url=url, params=params)
 
-    return response
+        return response
+    except Exception as e:
+        print(f"Error al enviar actualizaciones del bot de telegram: {e}")
 
 
 def get_openai_response(prompt):
@@ -49,7 +56,7 @@ def get_openai_response(prompt):
             ],
             max_tokens=150,
             n=1,
-            temperature=0.8,
+            temperature=0.5,
         )
 
         return response.choices[0].message.content.strip()
@@ -64,12 +71,20 @@ def main():
         updates = get_updates(offset=offset)
         if updates:
             for update in updates:
-                offset = update["update_id"] + 1
-                chat_id = update["message"]["chat"]["id"]
-                user_message = update["message"]["text"]
-                print(f"Message received: {user_message}")
-                gpt = get_openai_response(user_message)
-                send_messages(chat_id, gpt)
+                if "message" in update:
+                    offset = update["update_id"] + 1
+                    chat_id = update["message"]["chat"]["id"]
+                    user_message = update["message"]["text"]
+                    user_name = (
+                        update["message"]["from"]["first_name"]
+                        + " "
+                        + update["message"]["from"]["last_name"]
+                        + " - "
+                        + update["message"]["from"]["username"]
+                    )
+                    print(f"Message received: {user_message} from: {user_name}")
+                    gpt = get_openai_response(user_message)
+                    send_messages(chat_id, gpt)
         else:
             time.sleep(1)
 
